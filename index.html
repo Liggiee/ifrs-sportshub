@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sports Field Reservation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5c7f7;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(to right, #8e2de2, #ff6ec4);
+      color: #ffffff;
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom-left-radius: 40px;
+      border-bottom-right-radius: 40px;
+      position: relative;
+    }
+    .home-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #ffffff;
+      color: #8e2de2;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .fields {
+      margin-top: 30px;
+    }
+    .field-card {
+      background: #f5c7f7;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .field-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .arena-card {
+      background: #f5c7f7;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      position: relative;
+    }
+    .arena-card:hover {
+      background-color: #e3a5e8;
+    }
+    .arena-card h3, .arena-card p {
+      margin: 5px 0;
+    }
+    .view-map-button {
+      background-color: #6a1b9a;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      text-decoration: none;
+    }
+    .view-map-button:hover {
+      background-color: #4a148c;
+    }
+    .time-slot {
+      background: #e6e6e6;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .time-slot:hover {
+      background-color: #d0b8e6;
+    }
+    button {
+      background: #2980b9;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1c6ea4;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .back-button {
+      background-color: #f39c12;
+      padding: 10px 15px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .back-button:hover {
+      background-color: #e67e22;
+    }
+    .success-message {
+      color: green;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Sports Field Reservation System</h1>
+  <button class="home-button" onclick="goHome()">Home</button>
+</header>
+
+<div class="container" id="home-page">
+  <h2>Enter Your Details</h2>
+  <input type="text" id="name" placeholder="Enter your name" required />
+  <input type="date" id="date" required />
+</div>
+
+<div class="container fields" id="fields-page">
+  <h2>Available Fields</h2>
+
+  <div class="field-card" onclick="goToArenaPage('football')">
+    <img src="./football.jpg" alt="Football">
+    <h3>Football Field</h3>
+  </div>
+
+  <div class="field-card" onclick="goToArenaPage('cricket')">
+    <img src="./crick.jpg" alt="Cricket">
+    <h3>Cricket Field</h3>
+  </div>
+
+  <div class="field-card" onclick="goToArenaPage('badminton')">
+    <img src="./shuttle.jpg" alt="Badminton">
+    <h3>Badminton Court</h3>
+  </div>
+</div>
+
+<div class="container arena-selection" style="display:none;">
+  <h2>Select Arena for <span id="selectedFieldName"></span></h2>
+  <div id="arena-container"></div>
+  <div id="time-slot-container" style="margin-top: 20px;"></div>
+  <button class="back-button" onclick="goBackToFields()">Back</button>
+</div>
+
+<div class="container" id="payment-page" style="display:none;">
+  <h2>Payment Details</h2>
+  <input type="text" id="upi" placeholder="Enter UPI ID" required />
+  <button onclick="completeReservation()">Complete Payment</button>
+  <button class="back-button" onclick="goBackToArena()">Back</button>
+</div>
+
+<div class="container" id="reservations-page" style="display:none;">
+  <h2>Your Reservation</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Game</th>
+        <th>Arena</th>
+        <th>Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="reservation-list"></tbody>
+  </table>
+  <button class="back-button" onclick="goBackToArena()">Back</button>
+</div>
+
+<div id="payment-success" class="container" style="display:none;">
+  <h2 class="success-message">Your Payment Was Successfully Completed!</h2>
+  <button class="back-button" onclick="goHome()">Go Home</button>
+</div>
+
+<script>
+  let selectedField = '';
+  let selectedArena = '';
+  let userName = '';
+  let reservationDate = '';
+  let userUpi = '';
+  const reservations = [];
+
+  function goHome() {
+    document.getElementById('home-page').style.display = 'block';
+    document.getElementById('fields-page').style.display = 'block';
+    document.querySelector('.arena-selection').style.display = 'none';
+    document.getElementById('payment-page').style.display = 'none';
+    document.getElementById('reservations-page').style.display = 'none';
+    document.getElementById('payment-success').style.display = 'none';
+  }
+
+  function goToArenaPage(field) {
+    selectedField = field;
+    userName = document.getElementById("name").value.trim();
+    reservationDate = document.getElementById("date").value;
+
+    if (!userName || !reservationDate) {
+      return;  // Do not proceed if name or date is missing
+    }
+
+    sessionStorage.setItem("userName", userName);
+    sessionStorage.setItem("reservationDate", reservationDate);
+    sessionStorage.setItem("selectedField", selectedField);
+
+    displayArenaOptions(field);
+  }
+
+  function displayArenaOptions(field) {
+    const arenaContainer = document.getElementById("arena-container");
+    const fieldName = document.getElementById("selectedFieldName");
+    arenaContainer.innerHTML = '';
+    fieldName.textContent = field.charAt(0).toUpperCase() + field.slice(1);
+
+    const arenaInfo = {
+      football: [
+        { name: 'Hattrik', address: '64,MMS Complex,2nd floor, Jaihindpuram 2nd Main Rd, Madurai, Tamil Nadu 625011', map: 'https://maps.app.goo.gl/fg3mYTxXjxhKKLsQ9' },
+        { name: 'Day and Night', address: 'W39Q+9FG, Aswini St, Durai Samy Nagar, Madurai, Tamil Nadu 625010', map: 'https://maps.app.goo.gl/8x52dErV4jXBCrAFA' },
+        { name: 'Jaypal', address: 'Ponmeni, Madurai, Tamil Nadu 625016', map: 'https://maps.app.goo.gl/C656NKhktnTG1qZw6' }
+      ],
+      cricket: [
+        { name: 'Hattrik', address: '64,MMS Complex,2nd floor, Jaihindpuram 2nd Main Rd, Madurai, Tamil Nadu 625011', map: 'https://maps.google.com/?q=Cricket+Avenue' },
+        { name: 'Day and Night', address: 'W39Q+9FG, Aswini St, Durai Samy Nagar, Madurai, Tamil Nadu 625010', map: 'https://maps.app.goo.gl/8x52dErV4jXBCrAFA' },
+        { name: 'Jaypal', address: 'Ponmeni, Madurai, Tamil Nadu 625016', map: 'https://maps.app.goo.gl/C656NKhktnTG1qZw6' }
+      ],
+      badminton: [
+        { name: 'Day and Night', address: 'W39Q+9FG, Aswini St, Durai Samy Nagar, Madurai, Tamil Nadu 625010', map: 'https://maps.app.goo.gl/8x52dErV4jXBCrAFA' },
+        { name: 'Jaypal', address: 'Ponmeni, Madurai, Tamil Nadu 625016', map: 'https://maps.google.com/?q=East+Complex' },
+        { name: 'AV shuttle Park', address: 'W36X+9FW, State Bank Supervisors Colony, Madurai, Tamil Nadu 625016', map: 'https://maps.app.goo.gl/6K7jG3iKMszGyNA27' }
+      ]
+    };
+
+    arenaInfo[field].forEach(arena => {
+      const arenaCard = document.createElement('div');
+      arenaCard.classList.add('arena-card');
+      arenaCard.innerHTML = `
+        <h3>${arena.name}</h3>
+        <p>${arena.address}</p>
+        <a class="view-map-button" href="${arena.map}" target="_blank">View on Map</a>
+      `;
+      arenaCard.onclick = () => selectArena(arena.name);
+      arenaContainer.appendChild(arenaCard);
+    });
+
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('fields-page').style.display = 'none';
+    document.querySelector('.arena-selection').style.display = 'block';
+  }
+
+  function selectArena(arena) {
+    selectedArena = arena;
+    loadTimeSlots(arena);
+  }
+
+  function loadTimeSlots(arena) {
+    const timeSlots = [
+      "6am - 7am", "7am - 8am", "8am - 9am",
+      "9am - 10am", "10am - 11am", "11am - 12pm"
+    ];
+    const container = document.getElementById("time-slot-container");
+    container.innerHTML = `<h3>Select Time Slot for ${arena}</h3>`;
+
+    timeSlots.forEach(slot => {
+      const slotDiv = document.createElement('div');
+      slotDiv.classList.add('time-slot');
+      slotDiv.textContent = slot;
+      slotDiv.onclick = () => selectTimeSlot(slot);
+      container.appendChild(slotDiv);
+    });
+  }
+
+  function selectTimeSlot(time) {
+    const bookingDetails = {
+      name: userName,
+      field: selectedField,
+      arena: selectedArena,
+      date: reservationDate,
+      time: time
+    };
+
+    reservations.push(bookingDetails);
+
+    document.querySelector('.arena-selection').style.display = 'none';
+    document.getElementById('payment-page').style.display = 'block';
+  }
+
+  function completeReservation() {
+    userUpi = document.getElementById('upi').value.trim();
+
+    if (!userUpi) {
+      alert('Please enter your UPI ID to complete payment');
+      return;
+    }
+
+    // Simulating payment completion
+    setTimeout(() => {
+      document.getElementById('payment-page').style.display = 'none';
+      document.getElementById('payment-success').style.display = 'block';
+      updateReservationTable();
+    }, 1500);
+  }
+
+  function updateReservationTable() {
+    const reservationList = document.getElementById('reservation-list');
+    reservationList.innerHTML = '';
+
+    reservations.forEach(reservation => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${reservation.name}</td>
+        <td>${reservation.field}</td>
+        <td>${reservation.arena}</td>
+        <td>${reservation.time}</td>
+        <td>Completed</td>
+      `;
+      reservationList.appendChild(row);
+    });
+
+    document.getElementById('reservations-page').style.display = 'block';
+  }
+
+  function goBackToArena() {
+    document.getElementById('payment-page').style.display = 'none';
+    document.querySelector('.arena-selection').style.display = 'block';
+  }
+
+  function goBackToFields() {
+    document.getElementById('fields-page').style.display = 'block';
+    document.querySelector('.arena-selection').style.display = 'none';
+  }
+</script>
+</body>
+</html>
